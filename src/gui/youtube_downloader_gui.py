@@ -1,8 +1,8 @@
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QFileDialog, QComboBox, QProgressBar
 from src.core.youtube_downloader import download_youtube_video
 
-class YouTubeDownloaderWindow(QWidget):
+class YouTubeDownloaderWidget(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -10,8 +10,6 @@ class YouTubeDownloaderWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('YouTube Video Downloader')
-
         self.url_label = QLabel('Enter YouTube URL:')
         self.url_entry = QLineEdit()
 
@@ -28,6 +26,8 @@ class YouTubeDownloaderWindow(QWidget):
         self.download_button = QPushButton('Download')
         self.download_button.clicked.connect(self.on_download_clicked)
 
+        self.progress_bar = QProgressBar()
+
         layout = QVBoxLayout()
         layout.addWidget(self.url_label)
         layout.addWidget(self.url_entry)
@@ -37,11 +37,11 @@ class YouTubeDownloaderWindow(QWidget):
         layout.addWidget(self.resolution_label)
         layout.addWidget(self.resolution_combo)
         layout.addWidget(self.download_button)
-
+        layout.addWidget(self.progress_bar)
         self.setLayout(layout)
 
     def on_browse_clicked(self):
-        folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder', self.default_output_path)
+        folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
         if folder_path:
             self.output_entry.setText(folder_path)
 
@@ -49,11 +49,11 @@ class YouTubeDownloaderWindow(QWidget):
         url = self.url_entry.text()
         output_path = self.output_entry.text()
         resolution = self.resolution_combo.currentText()
+
+        self.progress_bar.setValue(0)
+
+        # def on_progress_callback(chunk_size, total_size):
+        #     progress = (chunk_size / total_size) * 100
+        #     self.progress_bar.setValue(progress)
+
         download_youtube_video(url, output_path, resolution)
-
-def run_gui():
-    app = QApplication([])
-    window = YouTubeDownloaderWindow()
-    window.show()
-    app.exec_()
-
